@@ -1,10 +1,9 @@
+
+## About this model
+
 This model simulates how clozapine affects the firing rate of dopaminergic (DA) neurons—and therefore the production of dopamine—in schizophrenic patients. It is based on a multi-compartmental model of a DA neuron (cited below), in which the firing rate of the neuron is primarily based on the L-type Ca+2 current and the A-type K+ currents.
 
 Kuznetsova, A. Y., Huertas, M. A., Kuznetsov, A. S., Paladini, C. A., & Canavier, C. C. (2010). Regulation of firing frequency in a computational model of a midbrain dopaminergic neuron. Journal of Computational Neuroscience, 28(3), 389–403. https://doi.org/10.1007/s10827-010-0222-y. These network models used in the present study were obtained from ModelDB (accession number 127507).
-
-# Kuznetsova2010
- 
-A python version of the hoc code from Kuznetsova et al, 2010. This version is hybrid - loads in the cell morphology from dopamine.hoc. Many other commands are issued in hoc using h(). Some are directly in python, as is plotting.
 
 ## Running the model
 
@@ -12,8 +11,8 @@ Make sure to compile the mechanisms first:
 
 In the directory of the model code, compile the *.mod mechanisms by running the following command in a terminal:
 
-On Windows, run `mknrndll`
-On Mac and Linux, run `nrnivmodl`
+On Windows, run `mknrndll`.
+On Mac and Linux, run `nrnivmodl`.
 
 Alternatively, open the NEURON Application folder (or program folder from the Start menu on Windows) and launch the mknrndll tool. When the gui appears, select the folder containing the code for Kuznetsova et al 2010. Then click the button to make nrnmech.dll.
 
