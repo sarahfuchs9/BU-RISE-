@@ -10,6 +10,8 @@ simulator, begin and end simulations, and plot variables during a
 simulation. """
 
 import matplotlib.pyplot as plt
+import riseplot
+
 from neuron import h
 h.load_file("stdlib.hoc")
 h.load_file("nrngui.hoc")
@@ -338,12 +340,24 @@ print("segments after ", h.tot)
 
 init_cell()	# Call the function to initialize our cell. 
 
+#%%
+inhibitory_syn_list = []
+def add_synapses():
+    for i in range(len(h.soma)):
+        syn = h.MyExp2Syn(h.soma[i](0.5)) # 
+        inhibitory_syn_list.append(syn)
+        syn.tau1 = 2 # ms - rise time constant
+        syn.tau2 = 10 # ms - decay time constant
+        syn.e = -70 # mV - GABA-A chloride
 
+add_synapses()
+
+#%%
 print("Kuznetsova et al. 2010")
 
 fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
 
-while fig[0].lower() != 'q':
+if fig[0].lower() != 'q':
     na_cond =  550.0e-6 
     kca_cond = 59.0e-6
     if fig[0] == '6':
@@ -377,4 +391,6 @@ while fig[0].lower() != 'q':
     
     init()
     runandplot(fig)
-    fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
+
+    riseplot.plot(soma)
+    # fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
