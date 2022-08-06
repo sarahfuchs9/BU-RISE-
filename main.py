@@ -10,12 +10,30 @@ simulator, begin and end simulations, and plot variables during a
 simulation. """
 
 import matplotlib.pyplot as plt
-import riseplot
+
 
 from neuron import h
+import cellClasses
+import define_stimcells
+
 h.load_file("stdlib.hoc")
 h.load_file("nrngui.hoc")
 h.load_file("dopaminergic.hoc")
+
+
+
+stimPeriodConst = 125 # ms, the interval between input spikes
+stimPeriodBurst = 20
+                 
+numExcCells = 2 #TODO
+numInhDendCells = 4
+numInhSomaCells = 1
+
+burst_excStimcell_list, burst_inhDendStimcell_list, burst_inhSomaStimcell_list, burst_cells = define_stimcells.make_burst_stim_cells(numExcCells, numInhDendCells, numInhSomaCells, stimPeriodBurst)
+const_excStimcell_list, const_inhDendStimcell_list, const_inhSomaStimcell_list, const_cells = define_stimcells.make_const_stim_cells(numExcCells, numInhDendCells, numInhSomaCells, stimPeriodConst)
+
+
+
 timecon = 0
 back= 0 #  switch for running in the background 
 sakmann=0
@@ -60,7 +78,7 @@ idur = 1000
 
 # PARAMETERS
 kdr_cond = 665.0e-6
-ca_cond = 11.196e-6
+ca_cond = 5e-6
 kca_cond = 59.0e-6
 a_cond_s = 570.0e-6
 a_cond_p = 285.0e-6
@@ -83,6 +101,8 @@ h("cvode = new CVode(0)") #  0 for clamp
 h("x= cvode.active(0)")
 
 stimobj = h.MyIClamp(h.soma[0](0.5))
+
+
 
 def init_cell():
     global g_celsius, stimobj
@@ -165,6 +185,9 @@ def init_cell():
     h("forall cm = global_cm")
     h("forall Ra = global_ra")
     g_celsius = 35
+    
+    h.PlotShape(False).plot(plt)
+
 
 
 def updatecell():
@@ -192,6 +215,8 @@ def updatecell():
     stimobj.amp = 0 # nA, contains the level of current being injected at any given time during simulation   
     stimobj.amp2 = iapl # nA, contains the level of current being injected at any given time during simulation   
     # in nA, -0.180nA=-180pA
+    
+    
     
     
     for sec in h.proxDend:
@@ -226,6 +251,8 @@ def updatecell():
     h("forall cm = global_cm")
     h("forall Ra = global_ra")
     g_celsius = 35
+        
+    
 
 
 def init():
@@ -250,7 +277,7 @@ def init():
         h.frecord_init()
         
         h.t=h.tstart
-
+        
 
 def runandplot(figtitle):
     if back == 1:
@@ -311,11 +338,12 @@ def runandplot(figtitle):
     
     vvec = h.Vector().record(h.soma[0](0.5)._ref_v)
     tvec = h.Vector().record(h._ref_t)
-    # ivec = h.Vector().record(stimobj._ref_i)
     h.tstop = 5000
     h.run()
     
     plt.figure()
+    
+
     plt.plot(tvec, vvec, linewidth=2, label=str("soma[0](0.5) voltage"))
     plt.ylim([-80, 0])
     if fig[0] != '2':
@@ -340,24 +368,12 @@ print("segments after ", h.tot)
 
 init_cell()	# Call the function to initialize our cell. 
 
-#%%
-inhibitory_syn_list = []
-def add_synapses():
-    for i in range(len(h.soma)):
-        syn = h.MyExp2Syn(h.soma[i](0.5)) # 
-        inhibitory_syn_list.append(syn)
-        syn.tau1 = 2 # ms - rise time constant
-        syn.tau2 = 10 # ms - decay time constant
-        syn.e = -70 # mV - GABA-A chloride
 
-add_synapses()
-
-#%%
 print("Kuznetsova et al. 2010")
 
 fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
 
-if fig[0].lower() != 'q':
+while fig[0].lower() != 'q':
     na_cond =  550.0e-6 
     kca_cond = 59.0e-6
     if fig[0] == '6':
@@ -391,6 +407,6 @@ if fig[0].lower() != 'q':
     
     init()
     runandplot(fig)
-
-    riseplot.plot(soma)
-    # fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
+        
+    
+    fig = input("Which figure do you want to run (or quit)? 2a2, 2b2, 2f2, or 6: ")
